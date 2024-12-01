@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Trash2 } from "lucide-react";
 import { GenerateVersionDialog } from "@/components/GenerateVersionDialog";
+import { BatchGradeDisplay } from "@/components/BatchGrade";
 
 interface Ingredient {
   name: string;
@@ -55,6 +56,7 @@ export function EditBatchPageContent({ id }: { id: string }) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [name, setName] = useState('');
+  const [grade, setGrade] = useState<Batch['grade']>();
 
   useEffect(() => {
     const fetchBatch = async () => {
@@ -72,8 +74,9 @@ export function EditBatchPageContent({ id }: { id: string }) {
         });
         
         setNotes(batch.notes.map(note => note.content));
-        setIsAiGenerated(batch.isAiGenerated);
+        setIsAiGenerated(batch.isAiGenerated || false);
         setName(batch.name || '');
+        setGrade(batch.grade);
       } catch (error) {
         console.error('Failed to fetch batch:', error);
       } finally {
@@ -144,6 +147,7 @@ export function EditBatchPageContent({ id }: { id: string }) {
         stabilizers: ingredients.stabilizers,
         ice: ingredients.ice,
         notes: notes.map(content => ({ content })),
+        grade,
       };
       
       console.log('Saving batch with data:', requestBody);
@@ -308,6 +312,14 @@ export function EditBatchPageContent({ id }: { id: string }) {
                 {note}
               </div>
             ))}
+          </div>
+
+          <div className="mb-8">
+            <h3 className="text-lg font-semibold mb-4">Grade</h3>
+            <BatchGradeDisplay
+              grade={grade}
+              onChange={setGrade}
+            />
           </div>
 
           <div className="flex justify-end gap-4">

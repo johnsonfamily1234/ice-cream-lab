@@ -6,7 +6,7 @@ import { Header } from "@/components/Header";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "A.I.ce Cream",
+  title: "Ice Cream Lab",
   description: "AI-powered ice cream recipe development",
 };
 

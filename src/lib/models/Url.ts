@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 
-const UrlSchema = new mongoose.Schema({
-  url: { type: String, required: true, unique: true },
-  content: { type: String },
-  lastIndexed: { type: Date },
-  createdAt: { type: Date, default: Date.now },
+const urlSchema = new mongoose.Schema({
+  url: { type: String, required: true },
+  hasContent: { type: Boolean, default: false },
+  lastIndexed: Date,
+  content: String
 });
 
-export const Url = mongoose.models.Url || mongoose.model('Url', UrlSchema); 
+export const Url = mongoose.models.Url || mongoose.model('Url', urlSchema); 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Link2 } from "lucide-react";
+import { FlaskConical, Link2 } from "lucide-react";
 
 export function Header() {
   const router = useRouter();
@@ -9,12 +9,15 @@ export function Header() {
   return (
     <header className="w-full bg-white border-b">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <h1 
-          className="text-2xl font-bold cursor-pointer hover:text-primary transition-colors"
-          onClick={() => router.push('/')}
-        >
-          A.I.ce Cream
-        </h1>
+        <div className="flex items-center gap-2">
+          <FlaskConical className="h-5 w-5" />
+          <h1 
+            className="text-2xl font-bold cursor-pointer hover:text-primary transition-colors"
+            onClick={() => router.push('/')}
+          >
+            Ice Cream Lab
+          </h1>
+        </div>
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push('/urls')}

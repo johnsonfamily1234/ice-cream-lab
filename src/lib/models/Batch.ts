@@ -14,8 +14,15 @@ const IngredientSchema = new mongoose.Schema({
 
 const NoteSchema = new mongoose.Schema({
   content: { type: String, required: true },
-  createdAt: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now }
 });
+
+const GradeSchema = new mongoose.Schema({
+  flavor: { type: Number, min: 0, max: 10 },
+  texture: { type: Number, min: 0, max: 10 },
+  overall: { type: Number, min: 0, max: 10 },
+  notes: String
+}, { _id: false });
 
 const BatchSchema = new mongoose.Schema({
   name: { 
@@ -38,6 +45,7 @@ const BatchSchema = new mongoose.Schema({
   referenceUrls: [{ type: String }],
   isAiGenerated: { type: Boolean, default: false },
   parentBatchId: { type: mongoose.Schema.Types.ObjectId, ref: 'Batch' },
+  grade: GradeSchema
 });
 
 export const Batch = mongoose.model('Batch', BatchSchema); 

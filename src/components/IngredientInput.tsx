@@ -41,13 +41,26 @@ export function IngredientInput({ type, value, onChange }: IngredientInputProps)
   const isIce = type === 'ice';
 
   const loadSuggestions = useCallback(async (search?: string) => {
+    if (search?.trim() === '') {
+      setSuggestions([]);
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
       const params = new URLSearchParams({ type });
       if (search) params.append('search', search);
       
-      const response = await fetch(`/api/ingredients?${params}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+      const response = await fetch(`/api/ingredients?${params}`, {
+        signal: controller.signal
+      });
+
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
         throw new Error('Failed to fetch ingredients');
       }
@@ -63,6 +76,10 @@ export function IngredientInput({ type, value, onChange }: IngredientInputProps)
         setSuggestions([]);
       }
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Request cancelled');
+        return;
+      }
       console.error('Failed to load suggestions:', error);
       setError(error instanceof Error ? error.message : 'Failed to load suggestions');
       setSuggestions([]);
@@ -72,11 +89,20 @@ export function IngredientInput({ type, value, onChange }: IngredientInputProps)
   }, [type]);
 
   useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
+
     const timer = setTimeout(() => {
-      loadSuggestions(searchTerm);
+      if (mounted && searchTerm.trim()) {
+        loadSuggestions(searchTerm);
+      }
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      mounted = false;
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [searchTerm, loadSuggestions]);
 
   const handleMeasurementChange = (
@@ -84,7 +110,6 @@ export function IngredientInput({ type, value, onChange }: IngredientInputProps)
     newValue: number
   ) => {
     if (isIce) {
-      // For ice, only update the specified field and liters (if cups were changed)
       const updatedValues = { ...value, [field]: newValue };
       if (field === 'cups') {
         updatedValues.liters = CONVERSIONS.cups.toLiters(newValue);
@@ -93,7 +118,6 @@ export function IngredientInput({ type, value, onChange }: IngredientInputProps)
       return;
     }
 
-    // For non-ice ingredients, update all measurements
     const updatedValues = { ...value, [field]: newValue };
 
     switch (field) {

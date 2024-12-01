@@ -1,28 +1,41 @@
+import type { BatchGrade } from "@/components/BatchGrade";
+
 export interface Note {
   content: string;
   createdAt: Date;
 }
 
-export interface Ingredient {
-  name: string;
-  grams: number;
-  cups: number;
-  liters: number;
-}
-
 export interface Batch {
   _id: string;
-  name: string;
+  name?: string;
   createdAt: Date;
-  dryIngredients: Ingredient[];
-  wetIngredients: Ingredient[];
-  stabilizers: Ingredient[];
-  ice: Ingredient[];
+  dryIngredients: Array<{
+    name: string;
+    grams: number;
+    cups: number;
+    liters: number;
+  }>;
+  wetIngredients: Array<{
+    name: string;
+    grams: number;
+    cups: number;
+    liters: number;
+  }>;
+  stabilizers: Array<{
+    name: string;
+    grams: number;
+    cups: number;
+    liters: number;
+  }>;
+  ice: Array<{
+    name: string;
+    grams: number;
+    cups: number;
+    liters: number;
+  }>;
   notes: Note[];
-  finalServedWeight?: number;
-  numberOfServings?: number;
-  rating?: number;
-  referenceUrls?: string[];
-  isAiGenerated: boolean;
+  isAiGenerated?: boolean;
   parentBatchId?: string;
+  rating?: number;
+  grade?: BatchGrade;
 } 
