@@ -3,9 +3,7 @@ import { BatchGradeDisplay } from "@/components/BatchGrade";
 import type { Batch } from "@/types/batch";
 import { Bot } from "lucide-react";
 
-export function BatchCard({ batch }: { batch: Batch }) {
-    console.log(batch);
-    
+export function BatchCard({ batch }: { batch: Batch }) {    
   return (
     <Card className="h-full flex flex-col justify-between">
       <CardHeader>

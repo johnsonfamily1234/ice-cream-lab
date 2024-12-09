@@ -38,6 +38,36 @@ interface ToolResponse {
   explanation: string;
 }
 
+// Add this interface near the top with other interfaces
+interface RawToolResponse {
+  properties?: ToolResponse;
+  name?: string;
+  dryIngredients?: Array<{
+    name: string;
+    grams: number;
+    cups: number;
+    liters: number;
+  }>;
+  wetIngredients?: Array<{
+    name: string;
+    grams: number;
+    cups: number;
+    liters: number;
+  }>;
+  stabilizers?: Array<{
+    name: string;
+    grams: number;
+    cups: number;
+    liters: number;
+  }>;
+  ice?: Array<{
+    name: string;
+    cups: number;
+    liters: number;
+  }>;
+  explanation?: string;
+}
+
 export async function POST(
   request: Request,
   { params }: { params: { id: string } }
@@ -160,14 +190,25 @@ Notes: ${batch.notes.map((note: Note) => note.content).join('\n')}
       tools
     });
 
+    console.log('AI Response:', JSON.stringify(message.content, null, 2));
+
     // Find the tool use response
     const toolUseContent = message.content.find(c => c.type === 'tool_use');
     if (!toolUseContent || toolUseContent.type !== 'tool_use') {
+      console.error('Invalid AI response - no tool use found:', message.content);
       throw new Error('No tool use found in response');
     }
 
-    // Add type assertion to the input
-    const modifications = toolUseContent.input as ToolResponse;
+    // Extract modifications from the input, handling the nested properties structure
+    const rawModifications = toolUseContent.input as RawToolResponse;
+    const modifications: ToolResponse = rawModifications.properties || rawModifications;
+    
+    // Validate the modifications
+    if (!modifications.name || !modifications.dryIngredients || !modifications.wetIngredients || 
+        !modifications.stabilizers || !modifications.ice) {
+      console.error('Invalid modifications from AI:', modifications);
+      throw new Error('Invalid or missing data in AI response');
+    }
 
     // Create a new batch with the modified ingredients
     const newBatchData = {
@@ -181,6 +222,7 @@ Notes: ${batch.notes.map((note: Note) => note.content).join('\n')}
       wetIngredients: modifications.wetIngredients,
       stabilizers: modifications.stabilizers,
       ice: modifications.ice,
+      grade: undefined,
       notes: [
         {
           content: `🤖 AI Suggestion: ${modifications.explanation}`,
